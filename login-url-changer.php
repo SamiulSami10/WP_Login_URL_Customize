@@ -49,17 +49,27 @@ add_action('init', function () {
     $custom_slug = luc_get_login_slug();
 
     if ($request_uri === $custom_slug) {
-        // Define expected globals to prevent PHP warnings
+        // This is your custom login page
         global $error, $interim_login, $user_login;
-
         $error = '';
         $interim_login = false;
         $user_login = '';
+        require_once ABSPATH . 'wp-login.php';
+        exit;
+    }
 
+    // 🔽 ADD THIS EMERGENCY BLOCK BELOW THAT ⬇️
+    if ($request_uri === 'login-emergency') {
+        // Emergency login fallback
+        global $error, $interim_login, $user_login;
+        $error = '';
+        $interim_login = false;
+        $user_login = '';
         require_once ABSPATH . 'wp-login.php';
         exit;
     }
 });
+
 
 
 
