@@ -14,6 +14,16 @@ Text Domain: login-url-changer
 
 defined('ABSPATH') or exit;
 
+
+// =============== ACTIVATION HOOK =============== //
+
+register_activation_hook(__FILE__, function () {
+    // Set a transient to show the welcome notice on next page load
+    set_transient('luc_show_activation_notice', true, 30);
+});
+
+
+
 /**
  * Get the custom login slug from plugin settings
  * Defaults to 'my-login' if not set
@@ -138,3 +148,21 @@ function luc_render_settings_page()
     </div>
     <?php
 }
+
+// =============== ADMIN NOTICE =============== //
+
+add_action('admin_notices', function () {
+    // Check if transient is set
+    if (get_transient('luc_show_activation_notice')) {
+        delete_transient('luc_show_activation_notice'); // Remove it after use
+
+        $slug = luc_get_login_slug();
+        $login_url = esc_url(home_url("/$slug"));
+
+        echo '<div class="notice notice-success is-dismissible">';
+        echo '<p><strong>Login URL Changer Activated!</strong><br>';
+        echo 'Your new login URL is: <a href="' . $login_url . '" target="_blank"><code>' . $login_url . '</code></a>.<br>';
+        echo 'Please bookmark it now to avoid getting locked out.</p>';
+        echo '</div>';
+    }
+});
